@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Seniorbook" default="build" basedir=".">
+    <property name="source" value="."/>
+    <property environment="env"/>
+
+    <target name="build" depends="createArchive"/>
+
+    <target name="createArchive" depends="getVersion">
+
+        <property name="folderName" value="php-strace-${version}"/>
+        <property name="fileName" value="${folderName}.tar.gz"/>
+
+        <delete file="${source}/${fileName}.tar.gz"/>
+
+        <tar destfile="${fileName}" compression="gzip">
+            <zipfileset dir="${source}/src" prefix="${folderName}/src"/>
+            <zipfileset dir="${source}/vendor/zendframework" prefix="${folderName}/vendor/zendframework"/>
+            <zipfileset dir="${source}/vendor/composer" prefix="${folderName}/vendor/composer"/>
+            <zipfileset dir="${source}/vendor" includes="autoload.php" prefix="${folderName}/vendor"/>
+            <zipfileset dir="${source}" includes="php-strace.php" prefix="${folderName}"/>
+            <tarfileset dir="${source}" filemode="555" fullpath="${folderName}/php-strace">
+                <include name="php-strace"/>
+            </tarfileset>
+        </tar>
+    </target>
+
+    <target name="getVersion">
+        <exec executable="${source}/scripts/version" outputproperty="version" failonerror="true"/>
+        <echo message="Building version: ${version}"/>
+    </target>
+</project>

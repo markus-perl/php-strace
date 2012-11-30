@@ -1,0 +1,6 @@
+#!/usr/bin/env php
+<?php
+//Outputs current version. Required vor ant
+require_once __DIR__ . '/../src/PhpStrace/Version.php';
+echo \PhpStrace\Version::ID;
+exit(0);
