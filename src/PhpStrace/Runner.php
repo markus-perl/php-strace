@@ -23,11 +23,6 @@ class Runner
     private $strace = null;
 
     /**
-     * @var int
-     */
-    private $memoryLimit = 512;
-
-    /**
      * @var string
      */
     private $scriptName = 'php-strace';
@@ -85,6 +80,9 @@ class Runner
             $this->getCommandLine()->stdout('php-strace starts a new strace instance for every running php5-cgi process and displays any segfault occurrence.');
             $this->getCommandLine()->stdout($e->getUsageMessage());
         } catch (ExitException $e) {
+            if ($e->getMessage()) {
+                $this->getCommandLine()->stdout($e->getMessage());
+            }
             exit($e->getCode());
         } catch (\Exception $e) {
             $this->getCommandLine()->stderr('Line ' . $e->getLine() . ' ' . $e->getFile() . ' - ' . $e->getMessage());
@@ -96,8 +94,8 @@ class Runner
      */
     public function bootstrap ()
     {
+        ini_set('memory_limit', '32M');
         set_time_limit(-1);
-        ini_set('memory_limit', $this->memoryLimit . 'M');
     }
 
     /**
@@ -118,10 +116,10 @@ class Runner
 
         $rules = array(
             'h|help' => 'show this help',
-            'm|memory=i' => 'memory limit in MB. Default: 512, min: 16, max 2048',
             'l|lines=i' => 'output the last N lines of a stacktrace. Default: 100',
             'process-name=s' => 'name of running php processes. Default: autodetect',
             'live' => 'search while running for new upcoming pid\'s',
+            'o|output=s' => 'output log to file'
         );
 
         $opts = new Console\Getopt($rules, $argv);
@@ -132,19 +130,18 @@ class Runner
             throw new Console\Exception\RuntimeException('', $opts->getUsageMessage());
         }
 
-        if ($opts->getOption('memory')) {
-            $limit = $opts->getOption('memory');
-            if ($limit >= 16 && $limit <= 2048) {
-                $this->setMemoryLimit($limit);
-            }
-        }
-
         if ($opts->getOption('lines')) {
             $this->getStrace()->setLines(min(1000, max(1, $opts->getOption('lines'))));
         }
 
         if ($opts->getOption('process-name')) {
             $this->getProcessStatus()->setProcessName($opts->getOption('process-name'));
+        }
+
+        if ($opts->getOption('output')) {
+            $fileOutput = new FileOutput($opts->getOption('output'));
+            $this->getCommandLine()->attachObserver($fileOutput, 'stdout');
+            $this->getCommandLine()->attachObserver($fileOutput, 'stderr');
         }
 
         if ($opts->getOption('live')) {
@@ -290,22 +287,5 @@ class Runner
             sleep(1);
         }
     }
-
-    /**
-     * @param int $memoryLimit
-     */
-    public function setMemoryLimit ($memoryLimit)
-    {
-        $this->memoryLimit = (int) $memoryLimit;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMemoryLimit ()
-    {
-        return $this->memoryLimit;
-    }
-
 
 }

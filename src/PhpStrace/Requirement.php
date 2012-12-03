@@ -1,6 +1,5 @@
 <?php
 namespace PhpStrace;
-use PhpStrace\Requirement\Result;
 
 interface Requirement
 {

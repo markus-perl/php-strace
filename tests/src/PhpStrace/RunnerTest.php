@@ -10,7 +10,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
         $runner = new \PhpStrace\Runner();
         $runner->bootstrap();
 
-        $this->assertEquals('512M', ini_get('memory_limit'));
+        $this->assertEquals('32M', ini_get('memory_limit'));
         $this->assertEquals('-1', ini_get('max_execution_time'));
     }
 
@@ -39,19 +39,6 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
 
         $runner = new \PhpStrace\Runner();
         $runner->parseGetOpt($argv);
-    }
-
-    public function testParseGetOptMemory ()
-    {
-        $argv = array(
-            'php-strace',
-            '-m',
-            '256'
-        );
-
-        $runner = new \PhpStrace\Runner();
-        $runner->parseGetOpt($argv);
-        $this->assertEquals(256, $runner->getMemoryLimit());
     }
 
     public function testParseGetOptLines ()
@@ -92,6 +79,42 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($runner->getLive());
     }
 
+    /**
+     * @expectedException \PhpStrace\ExitException
+     * @expectedExceptionMessage cannot open file /foo/bar for writing.
+     */
+    public function testParseGetOptOutputInvalidPath()
+    {
+        $argv = array(
+            'php-strace',
+            '-o',
+            '/foo/bar'
+        );
+
+        $runner = new \PhpStrace\Runner();
+        $runner->parseGetOpt($argv);
+    }
+
+    /**
+     */
+    public function testParseGetOptOutputValidPath()
+    {
+        $argv = array(
+            'php-strace',
+            '-o',
+            $path = '/tmp/php-strace.phpunit.log'
+        );
+
+        $runner = new \PhpStrace\Runner();
+        $runner->parseGetOpt($argv);
+
+        $observers = $runner->getCommandLine()->getObservers('stdout');
+        $this->assertInstanceOf('\PhpStrace\FileOutput', $observers[0]);
+        $this->assertEquals($path, $observers[0]->getFilePath());
+    }
+
+
+
     public function testSetGetCommandLine ()
     {
         $runner = new \PhpStrace\Runner();
@@ -130,13 +153,6 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
         $runner->checkRequirements();
     }
 
-    public function testGetSetMemoryLimit ()
-    {
-        $runner = new \PhpStrace\Runner();
-
-        $runner->setMemoryLimit($memoryLimit = 128);
-        $this->assertEquals($memoryLimit, $runner->getMemoryLimit());
-    }
 
     public function testSetGetLive ()
     {

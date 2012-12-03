@@ -2,7 +2,7 @@
 namespace PhpStrace;
 use PhpStrace\CommandLine\Execute\Result;
 
-class CommandLine
+class CommandLine implements Observerable
 {
 
     /**
@@ -14,6 +14,63 @@ class CommandLine
      * @var resource
      */
     private $stderr = null;
+
+    /**
+     * @var array
+     */
+    private $observers = array();
+
+    /**
+     * @param resource $stderr
+     */
+    public function setStderr ($stderr)
+    {
+        $this->stderr = $stderr;
+    }
+
+    /**
+     * @param resource $stdout
+     */
+    public function setStdout ($stdout)
+    {
+        $this->stdout = $stdout;
+    }
+
+    /**
+     * @param Observer $observer
+     * @param string $eventType
+     */
+    public function attachObserver (Observer $observer, $eventType)
+    {
+        if (false === isset($this->observers[$eventType])) {
+            $this->observers[$eventType] = array();
+        }
+
+        $this->observers[$eventType][] = $observer;
+    }
+
+    /**
+     * @param string $eventType
+     * @param array $data
+     */
+    public function fireEvent ($eventType, $data = array())
+    {
+        foreach ($this->getObservers($eventType) as $observer) {
+            $observer->notify($this, $data);
+        }
+    }
+
+    /**
+     * @param string $eventType
+     * @return array
+     */
+    public function getObservers ($eventType)
+    {
+        if (isset($this->observers[$eventType])) {
+            return $this->observers[$eventType];
+        }
+        return array();
+    }
 
     /**
      * Checks if a specified command line tool
@@ -54,6 +111,9 @@ class CommandLine
         }
 
         fwrite($this->stdout, $text . PHP_EOL);
+        $this->fireEvent('stdout', array(
+                                        'text' => $text
+                                   ));
     }
 
     /**
@@ -66,6 +126,10 @@ class CommandLine
         }
 
         fwrite($this->stderr, $text . PHP_EOL);
+
+        $this->fireEvent('stderr', array(
+                                        'text' => $text
+                                   ));
     }
 
     /**
@@ -73,11 +137,11 @@ class CommandLine
      */
     public function __destruct ()
     {
-        if (null !== $this->stdout) {
+        if (is_resource($this->stdout)) {
             fclose($this->stdout);
         }
 
-        if (null !== $this->stderr) {
+        if (is_resource($this->stderr)) {
             fclose($this->stderr);
         }
     }

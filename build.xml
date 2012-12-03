@@ -6,7 +6,7 @@
 
     <target name="build" depends="createArchive"/>
 
-    <target name="createArchive" depends="getVersion">
+    <target name="createArchive" depends="getVersion, phpunit">
 
         <property name="folderName" value="php-strace-${version}"/>
         <property name="fileName" value="${folderName}.tar.gz"/>
@@ -28,5 +28,9 @@
     <target name="getVersion">
         <exec executable="${source}/scripts/version" outputproperty="version" failonerror="true"/>
         <echo message="Building version: ${version}"/>
+    </target>
+
+    <target name="phpunit" description="Run unit tests using PHPUnit">
+        <exec executable="${source}/scripts/phpunit" failonerror="true"/>
     </target>
 </project>
