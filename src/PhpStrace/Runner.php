@@ -94,6 +94,9 @@ class Runner
      */
     public function bootstrap ()
     {
+        if ('' == ini_get('date.timezone')) {
+            date_default_timezone_set('Europe/Berlin');
+        }
         ini_set('memory_limit', '32M');
         set_time_limit(-1);
     }

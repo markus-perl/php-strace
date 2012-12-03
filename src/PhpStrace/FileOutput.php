@@ -75,7 +75,7 @@ class FileOutput implements Observer
     public function notify (Observerable $observerable, $data = array())
     {
         if (isset($data['text'])) {
-            $formatted = sprintf('%s - %s' . PHP_EOL, date('Y-m-d h:m:s', $this->getTime()), $data['text']);
+            $formatted = sprintf('%s - %s' . PHP_EOL, date('Y-m-d H:i:s', $this->getTime()), $data['text']);
 
             $writeResult = fwrite($this->fileHandle, $formatted);
         }
