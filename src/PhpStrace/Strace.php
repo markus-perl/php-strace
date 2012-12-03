@@ -6,6 +6,8 @@ use PhpStrace\CommandLine;
 class Strace implements Requirement
 {
 
+    const SIGSEGV = 'SIGSEGV (Segmentation fault)';
+
     private $cmd = 'strace';
 
     /**
@@ -95,18 +97,22 @@ class Strace implements Requirement
 
 
     /**
-     * @param $phpPid
-     * @return true isChild
+     * @param int $phpPid
+     * @param bool testing
+     * @return bool isChild
      */
-    public function watch ($phpPid)
+    public function watch ($phpPid, $testing = false)
     {
-        $pid = pcntl_fork();
-
-        if ($pid === -1) {
-            throw new Exception('could not fork for pid ' . $pid);
+        $pid = null;
+        if ($testing == false) {
+            $pid = pcntl_fork();
         }
 
-        if ($pid) {
+        if ($pid === -1) {
+            throw new Exception('could not create fork for pid ' . $pid);
+        }
+
+        if ($pid && $testing == false) {
             pcntl_waitpid($pid, $status, WNOHANG);
             return $pid;
         } else {
@@ -114,14 +120,14 @@ class Strace implements Requirement
             $this->commandLine->stdout('starting strace on pid ' . $phpPid . '.');
 
             $result = $this->commandLine->execute($this->cmd . ' -q -s 256 -p ' . escapeshellarg($phpPid) . ' 2>&1 | tail -' . $this->lines);
-            $this->commandLine->stdout($result->getReturnVar());
 
-            foreach ($result->getOutput() as $line) {
-                $this->commandLine->stdout($line);
-            }
+            $this->commandLine->stdout('pid ' . $phpPid . ' finished running with exit code ' . $result->getReturnVar() . '.');
 
-            if ($result->getReturnVar() != 0) {
-                $this->commandLine->stdout($result->getReturnVar());
+
+            if ($result->getReturnVar() != 0 || substr_count(implode(' ', $result->getOutput()), self::SIGSEGV)) {
+                foreach ($result->getOutput() as $line) {
+                    $this->commandLine->stdout($line);
+                }
             }
 
             return false;

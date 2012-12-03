@@ -1,8 +1,10 @@
 php-strace
 ==========
 
-php-strace helps to track down segfaults in running php processes. It starts for every running php5-cgi or php-fpm process a new strace instance to monitor if
+php-strace helps to track down segfaults in running php processes. It starts for every
+running php5-cgi or php-fpm process a new strace instance to monitor if
 a segfault happens. If a segfault occurs it will display the strace output of the faulty process.
+
 
 Requirements
 ------------
@@ -18,6 +20,7 @@ Installation
 
 * Download latest version and extract it to any folder
 
+
 Usage
 ----------------------
 
@@ -32,6 +35,7 @@ Commandline options
     -m|--memory <integer>   memory limit in MB. Default: 512, min: 16, max 2048
     -l|--lines <integer>    output the last N lines of a stacktrace. Default: 100
     --process-name <string> name of running php processes. Default: autodetect
+    --live                  search while running for new upcoming pid's
 
 
 Developing

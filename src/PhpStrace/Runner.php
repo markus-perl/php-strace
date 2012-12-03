@@ -33,6 +33,27 @@ class Runner
     private $scriptName = 'php-strace';
 
     /**
+     * @var bool
+     */
+    private $live = false;
+
+    /**
+     * @param boolean $live
+     */
+    public function setLive ($live)
+    {
+        $this->live = (boolean) $live;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getLive ()
+    {
+        return $this->live;
+    }
+
+    /**
      * @param string $scriptName
      */
     public function setScriptName ($scriptName)
@@ -59,8 +80,7 @@ class Runner
             $this->parseGetOpt($argv);
             $this->checkRequirements();
             $this->bootstrap();
-            $pids = $this->fetchPids();
-            $this->watchPids($pids);
+            $this->watchPids();
         } catch (Console\Exception\RuntimeException $e) {
             $this->getCommandLine()->stdout('php-strace starts a new strace instance for every running php5-cgi process and displays any segfault occurrence.');
             $this->getCommandLine()->stdout($e->getUsageMessage());
@@ -85,7 +105,7 @@ class Runner
      */
     public function showWelcomeMessage ()
     {
-        $this->getCommandLine()->stdout('php-strace ' . Version::ID . ' by Markus Perl (http://www.github.com)');
+        $this->getCommandLine()->stdout('php-strace ' . Version::ID . ' by Markus Perl (http://www.github.com/markus-perl/php-strace)');
         $this->getCommandLine()->stdout('');
     }
 
@@ -100,7 +120,8 @@ class Runner
             'h|help' => 'show this help',
             'm|memory=i' => 'memory limit in MB. Default: 512, min: 16, max 2048',
             'l|lines=i' => 'output the last N lines of a stacktrace. Default: 100',
-            'process-name=s' => 'name of running php processes. Default: autodetect'
+            'process-name=s' => 'name of running php processes. Default: autodetect',
+            'live' => 'search while running for new upcoming pid\'s',
         );
 
         $opts = new Console\Getopt($rules, $argv);
@@ -125,6 +146,10 @@ class Runner
         if ($opts->getOption('process-name')) {
             $this->getProcessStatus()->setProcessName($opts->getOption('process-name'));
         }
+
+        if ($opts->getOption('live')) {
+            $this->setLive(true);
+        }
     }
 
     /**
@@ -146,7 +171,6 @@ class Runner
     {
         $this->commandLine = $commandLine;
     }
-
 
     /**
      * @return ProcessStatus
@@ -218,19 +242,26 @@ class Runner
         return $pids;
     }
 
+    private function startStrace ($pid)
+    {
+        $pidWatching = $this->getStrace()->watch($pid);
+        if (false == $pidWatching) {
+            throw new ExitException('', 0);
+        }
+
+        return $pidWatching;
+    }
+
     /**
      * @param array $pids
      */
-    public function watchPids (array $pids)
+    public function watchPids ()
     {
+        $pids = $this->fetchPids();
+
         $pidsWatching = array();
         foreach ($pids as $pid) {
-
-            $pidWatching = $this->getStrace()->watch($pid);
-            if (false == $pidWatching) {
-                return;
-            }
-
+            $pidWatching = $this->startStrace($pid);
             $pidsWatching[] = $pidWatching;
         }
 
@@ -242,6 +273,18 @@ class Runner
             if ($pid) {
                 $pidsWatching = array_diff($pidsWatching, array($pid));
                 $this->getCommandLine()->stdout('child with pid ' . $pid . ' terminated');
+            }
+
+            if ($this->getLive()) {
+                $currentPids = $this->fetchPids();
+                $diff = array_diff($currentPids, $pids);
+                if (count($diff)) {
+                    foreach ($diff as $pid) {
+                        $pidWatching = $this->startStrace($pid);
+                        $pidsWatching[] = $pidWatching;
+                    }
+                    $pids = $currentPids;
+                }
             }
 
             sleep(1);

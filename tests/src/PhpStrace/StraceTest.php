@@ -60,4 +60,65 @@ class StraceTest extends \PHPUnit_Framework_TestCase
             exit;
         }
     }
+
+    public function testWatchOutputExitCode1 ()
+    {
+        $result = new \PhpStrace\CommandLine\Execute\Result;
+        $result->setReturnVar(1);
+        $result->setOutput(array('error message'));
+
+        $commandLine = $this->getMock('\PhpStrace\CommandLine', array(
+                                                                     'stdout',
+                                                                     'execute'
+                                                                ));
+        $commandLine->expects($this->exactly(3))->method('stdout');
+        $commandLine->expects($this->any())->method('execute')->will($this->returnValue($result));
+        $commandLine->expects($this->at(3))->method('stdout')->with('error message');
+
+        $strace = new \PhpStrace\Strace($commandLine);
+
+        $strace->watch(123456, true);
+    }
+
+    public function testWatchOutputExitCode0 ()
+    {
+        $result = new \PhpStrace\CommandLine\Execute\Result;
+        $result->setReturnVar(0);
+        $result->setOutput(array('some output'));
+
+        $commandLine = $this->getMock('\PhpStrace\CommandLine', array(
+                                                                     'stdout',
+                                                                     'execute'
+                                                                ));
+        $commandLine->expects($this->exactly(2))->method('stdout');
+        $commandLine->expects($this->any())->method('execute')->will($this->returnValue($result));
+
+        $strace = new \PhpStrace\Strace($commandLine);
+
+        $strace->watch(123456, true);
+    }
+
+    public function testWatchOutputSegfault ()
+    {
+        $result = new \PhpStrace\CommandLine\Execute\Result;
+        $result->setReturnVar(0);
+        $result->setOutput(array(
+                                'some output',
+                                \PhpStrace\Strace::SIGSEGV
+                           ));
+
+        $commandLine = $this->getMock('\PhpStrace\CommandLine', array(
+                                                                     'stdout',
+                                                                     'execute'
+                                                                ));
+        $commandLine->expects($this->exactly(4))->method('stdout');
+        $commandLine->expects($this->any())->method('execute')->will($this->returnValue($result));
+        $commandLine->expects($this->at(3))->method('stdout')->with('some output');
+        $commandLine->expects($this->at(4))->method('stdout')->with(\PhpStrace\Strace::SIGSEGV);
+
+
+        $strace = new \PhpStrace\Strace($commandLine);
+
+        $strace->watch(123456, true);
+    }
 }

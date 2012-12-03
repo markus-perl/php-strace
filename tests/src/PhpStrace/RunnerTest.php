@@ -18,7 +18,9 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     {
         $runner = new \PhpStrace\Runner();
         $commandLine = $this->getMock('\PhpStrace\CommandLine', array('stdout'));
-        $commandLine->expects($this->at(0))->method('stdout')->with('php-strace ' . \PhpStrace\Version::ID . ' by Markus Perl (http://www.github.com)');
+
+        $msg = 'php-strace ' . \PhpStrace\Version::ID . ' by Markus Perl (http://www.github.com/markus-perl/php-strace)';
+        $commandLine->expects($this->at(0))->method('stdout')->with($msg);
         $commandLine->expects($this->at(1))->method('stdout')->with('');
 
         $runner->setCommandLine($commandLine);
@@ -78,6 +80,18 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('php54-cgi', $runner->getProcessStatus()->getProcessName());
     }
 
+    public function testParseGetOptLive()
+    {
+        $argv = array(
+            'php-strace',
+            '--live',
+        );
+
+        $runner = new \PhpStrace\Runner();
+        $runner->parseGetOpt($argv);
+        $this->assertTrue($runner->getLive());
+    }
+
     public function testSetGetCommandLine ()
     {
         $runner = new \PhpStrace\Runner();
@@ -122,6 +136,13 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
 
         $runner->setMemoryLimit($memoryLimit = 128);
         $this->assertEquals($memoryLimit, $runner->getMemoryLimit());
+    }
+
+    public function testSetGetLive ()
+    {
+        $runner = new \PhpStrace\Runner();
+        $runner->setLive(true);
+        $this->assertTrue($runner->getLive());
     }
 
 }

@@ -19,7 +19,8 @@ Vagrant::Config.run do |config|
     end
 
 	#Forward a port from the guest to the host, which allows for outside computers to access the VM, whereas host only networking does not.
-	config.vm.forward_port 80, 8080 #nginx
+	config.vm.forward_port 80, 8080 #php5-cgi
+	config.vm.forward_port 81, 8081 #php-fpm
 
     # Puppet provision
     config.vm.provision :puppet, :module_path => "puppet/modules" do |puppet|
