@@ -11,9 +11,9 @@
         <property name="folderName" value="php-strace-${version}"/>
         <property name="fileName" value="${folderName}.tar.gz"/>
 
-        <delete file="${source}/${fileName}.tar.gz"/>
+        <delete file="${source}/${fileName}"/>
 
-        <tar destfile="${fileName}" compression="gzip">
+        <tar longfile="gnu" destfile="${fileName}" compression="gzip">
             <zipfileset dir="${source}/src" prefix="${folderName}/src"/>
             <zipfileset dir="${source}/vendor/zendframework" prefix="${folderName}/vendor/zendframework"/>
             <zipfileset dir="${source}/vendor/composer" prefix="${folderName}/vendor/composer"/>

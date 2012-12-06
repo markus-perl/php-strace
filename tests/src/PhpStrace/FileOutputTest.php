@@ -18,4 +18,4 @@ class FileOutputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2012-12-03 04:22:27 - test' . PHP_EOL, fread($tmpFile, 64));
     }
 
-}   
+}
