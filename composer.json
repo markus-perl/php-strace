@@ -5,8 +5,6 @@
             "url": "http://packages.zendframework.com/"
         }
     ],
-    "name": "phpunit",
-    "description": "PHPUnit",
     "require": {
         "phpunit/phpunit": "3.7.*",
         "zendframework/zend-console": "2.0.*"

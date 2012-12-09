@@ -22,6 +22,12 @@
             <tarfileset dir="${source}" filemode="555" fullpath="${folderName}/php-strace">
                 <include name="php-strace"/>
             </tarfileset>
+            <tarfileset dir="${source}" fullpath="${folderName}/README">
+                <include name="README.md"/>
+            </tarfileset>
+            <tarfileset dir="${source}" fullpath="${folderName}/LICENSE">
+                <include name="LICENSE"/>
+            </tarfileset>
         </tar>
     </target>
 
