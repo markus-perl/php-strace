@@ -62,5 +62,5 @@ To run the tests ssh to your vagrant machine and enter:
 
 Contact
 -------
-Github: [http://www.github.com/markus-perl/php-strace]
-E-Mail: markus <at> open-mmx.de
+* Github: [http://www.github.com/markus-perl/php-strace](http://www.github.com/markus-perl/php-strace)
+* E-Mail: markus <at> open-mmx.de
