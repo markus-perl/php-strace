@@ -19,11 +19,12 @@ Requirements
 * root access
 
 
-Installation
-------------
+Installation and Downloads
+--------------------------
 
-* Download latest version and extract it to any folder
+Download latest version and extract it to any folder
 
+* [php-strace-0.2.tar.gz](https://dl.dropbox.com/u/32252351/github/php-strace-0.2.tar.gz)
 
 Usage
 ----------------------
