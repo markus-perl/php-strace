@@ -15,7 +15,7 @@ class project::puppet {
 	    owner => root,
 	    group => root,
 	    mode => 555,
-	    source => "/tmp/vagrant-puppet/modules-0/project/files/puppet-apply.sh"
+	    source => "puppet:///modules/project/puppet-apply.sh"
 	}
 
 	exec { "/usr/bin/fromdos /usr/bin/puppet-apply":

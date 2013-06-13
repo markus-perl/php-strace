@@ -11,7 +11,7 @@ class project::nginx {
 	    owner => root,
 	    group => root,
 	    mode => 644,
-	    source => "/tmp/vagrant-puppet/modules-0/project/files/nginx/fastcgi.conf"
+	    source => "puppet:///modules/project/nginx/fastcgi.conf"
 	}
 
 	file { "/etc/nginx/nginx.conf":
@@ -19,7 +19,7 @@ class project::nginx {
 	    owner => root,
 	    group => root,
 	    mode => 644,
-	    source => "/tmp/vagrant-puppet/modules-0/project/files/nginx/nginx.conf"
+	    source => "puppet:///modules/project/nginx/nginx.conf"
 	}
 
 	file { "/etc/nginx/sites-enabled/default":
@@ -27,7 +27,7 @@ class project::nginx {
 	    owner => root,
 	    group => root,
 	    mode => 644,
-	    source => "/tmp/vagrant-puppet/modules-0/project/files/nginx/sites-enabled/default",
+	    source => "puppet:///modules/project/nginx/sites-enabled/default",
 	}
 
 	exec { "/etc/init.d/nginx restart":

@@ -54,6 +54,19 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(200, $runner->getStrace()->getLines());
     }
 
+    public function testParseGetOptLineLength ()
+    {
+        $argv = array(
+            'php-strace',
+            '--line-length',
+            '300'
+        );
+
+        $runner = new \PhpStrace\Runner();
+        $runner->parseGetOpt($argv);
+        $this->assertEquals(300, $runner->getStrace()->getLineLength());
+    }
+
     public function testParseGetOptProcessName ()
     {
         $argv = array(

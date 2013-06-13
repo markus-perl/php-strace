@@ -21,6 +21,11 @@ class Strace implements Requirement
     private $lines = 100;
 
     /**
+     * @var int
+     */
+    private $lineLength = 512;
+
+    /**
      * @param string $cmd
      */
     public function setCmd ($cmd)
@@ -53,6 +58,29 @@ class Strace implements Requirement
     public function getLines ()
     {
         return $this->lines;
+    }
+
+    /**
+     * @param int $lineLength
+     */
+    public function setLineLength ($lineLength)
+    {
+        $lineLength = (int) $lineLength;
+
+        //max 1MB
+        if ($lineLength < 1 || $lineLength > 1 * 1024 * 1024) {
+            throw new Exception('invalid line length');
+        }
+
+        $this->lineLength = $lineLength;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLineLength ()
+    {
+        return $this->lineLength;
     }
 
 
@@ -119,10 +147,9 @@ class Strace implements Requirement
             // child process runs what is here
             $this->commandLine->stdout('starting strace on pid ' . $phpPid . '.');
 
-            $result = $this->commandLine->execute($this->cmd . ' -q -s 256 -p ' . escapeshellarg($phpPid) . ' 2>&1 | tail -' . $this->lines);
+            $result = $this->commandLine->execute($this->cmd . ' -q -s ' . $this->getLineLength() . ' -p ' . escapeshellarg($phpPid) . ' 2>&1 | tail -' . $this->getLines());
 
             $this->commandLine->stdout('pid ' . $phpPid . ' finished running with exit code ' . $result->getReturnVar() . '.');
-
 
             if ($result->getReturnVar() != 0 || substr_count(implode(' ', $result->getOutput()), self::SIGSEGV)) {
                 foreach ($result->getOutput() as $line) {
@@ -133,6 +160,5 @@ class Strace implements Requirement
             return false;
         }
     }
-
 
 }

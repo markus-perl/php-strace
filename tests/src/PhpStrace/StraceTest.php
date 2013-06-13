@@ -13,6 +13,15 @@ class StraceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($lines, $strace->getLines());
     }
 
+    public function testSetGetLineLength ()
+    {
+        $commandLine = $this->getMock('\PhpStrace\CommandLine');
+        $strace = new \PhpStrace\Strace($commandLine);
+        $strace->setLineLength($length = 1024);
+
+        $this->assertEquals(1024, $strace->getLineLength());
+    }
+
     public function testSetGetCmd ()
     {
         $commandLine = $this->getMock('\PhpStrace\CommandLine');

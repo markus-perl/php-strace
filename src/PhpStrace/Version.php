@@ -3,5 +3,5 @@ namespace PhpStrace;
 
 class Version
 {
-    const ID = '0.2';
+    const ID = '0.3';
 }

@@ -120,6 +120,7 @@ class Runner
         $rules = array(
             'h|help' => 'show this help',
             'l|lines=i' => 'output the last N lines of a stacktrace. Default: 100',
+            'line-length=i' => 'maximum length of a line. Default 512',
             'process-name=s' => 'name of running php processes. Default: autodetect',
             'live' => 'search while running for new upcoming pid\'s',
             'o|output=s' => 'output log to file'
@@ -135,6 +136,10 @@ class Runner
 
         if ($opts->getOption('lines')) {
             $this->getStrace()->setLines(min(1000, max(1, $opts->getOption('lines'))));
+        }
+
+        if ($opts->getOption('line-length')) {
+            $this->getStrace()->setLineLength(min(1 * 1024 * 1024, max(10, $opts->getOption('line-length'))));
         }
 
         if ($opts->getOption('process-name')) {
