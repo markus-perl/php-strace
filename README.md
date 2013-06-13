@@ -24,7 +24,9 @@ Installation and Downloads
 
 Download latest version and extract it to any folder
 
+* [php-strace-0.3.tar.gz](https://dl.dropboxusercontent.com/u/32252351/github/php-strace-0.3.tar.gz)
 * [php-strace-0.2.tar.gz](https://dl.dropbox.com/u/32252351/github/php-strace-0.2.tar.gz)
+
 
 Usage
 ----------------------
