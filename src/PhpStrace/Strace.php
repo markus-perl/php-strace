@@ -116,7 +116,7 @@ class Strace implements Requirement
         if ($result->getSucess()) {
             if (false === function_exists('pcntl_fork')) {
                 $result->setSucess(false);
-                $result->setErrorMessage('PCNTL extension not found. Please install PHP PCNTL extension.');
+                $result->setErrorMessage('PCNTL extension not found. Please install PHP PCNTL extension. If the extension is installed, check your php.ini if there are some pcntl functions disabled (https://github.com/markus-perl/php-strace/issues/1).');
             }
         }
 
