@@ -1,2 +1,2 @@
 #!/bin/sh
-/vagrant/vendor/phpunit/phpunit/composer/bin/phpunit "$@"
+/vagrant/vendor/phpunit/phpunit/phpunit "$@"

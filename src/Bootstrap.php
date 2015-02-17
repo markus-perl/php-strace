@@ -1,5 +1,6 @@
 <?php
 $basePath = realpath(__DIR__ . '/..');
+date_default_timezone_set('America/Los_Angeles');
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $basePath);
 $autoloder = function ($dir, $className) use ($basePath) {

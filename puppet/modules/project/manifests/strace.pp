@@ -1,6 +1,6 @@
-class project::ant {
+class project::strace {
 
-	package { "ant":
+	package { "strace":
 		ensure => installed,
 		require => Class["project::apt"]
 	}

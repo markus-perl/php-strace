@@ -1,4 +1,3 @@
-
 server {
 	listen   80 default;
 	server_name  localhost;
@@ -11,33 +10,11 @@ server {
     index index.php;
 
 	location ~ \.php$ {
-	    fastcgi_pass   localhost:9000;
-		include        fastcgi.conf;
+	    fastcgi_pass   unix:/var/run/php5-fpm.sock;
+		include        fastcgi_params;
 	}
 
 	if (!-e $request_filename) {
     	rewrite ^.*$ /index.php last;
   	}
 }
-
-server {
-	listen   81 default;
-	server_name  localhost;
-
-	access_log  /tmp/nginx.access.log;
- 	error_log  /tmp/nginx.error.log debug;
-
-    root   /vagrant/tests/public;
-
-    index index.php;
-
-	location ~ \.php$ {
-	    fastcgi_pass   localhost:9001;
-		include        fastcgi.conf;
-	}
-
-	if (!-e $request_filename) {
-    	rewrite ^.*$ /index.php last;
-  	}
-}
-
